@@ -5,12 +5,12 @@ from beanie.odm.operators.find.logical import And
 from pydantic import Field
 from pymongo import IndexModel, ASCENDING
 
-from app.core.tenant_context import get_current_tenant
+from app.core.context import get_context
 
 
 class BaseDocument(Document):  # pylint: disable=too-many-ancestors
     """Base schema"""
-    tenant_id: str = Field(default_factory=get_current_tenant)
+    tenant_id: str = Field(default_factory=lambda: get_context("tenant_id"))
     created_at: datetime.datetime = Field(default_factory=lambda: datetime.datetime.now(datetime.UTC))
 
     class Settings:
@@ -30,7 +30,7 @@ class BaseDocument(Document):  # pylint: disable=too-many-ancestors
     # -----------------------------
     @classmethod
     def find(cls, *args: Any, **kwargs: Any):
-        tenant_id = get_current_tenant()
+        tenant_id = get_context("tenant_id")
 
         # Always enforce tenant filter
         if args:

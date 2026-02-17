@@ -1,6 +1,6 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Request
-from app.core.tenant_context import set_current_tenant
+from app.core.context import set_context
 
 
 class TenantMiddleware(BaseHTTPMiddleware):
@@ -11,7 +11,8 @@ class TenantMiddleware(BaseHTTPMiddleware):
         # TODO: Get the tenant id from the token.
         tenant_id = request.headers.get("X-Tenant-ID", "")
         
-        set_current_tenant(tenant_id)
+        # Set the tenant context
+        set_context("tenant_id", tenant_id)
 
         request.state.tenant_id = tenant_id
         response = await call_next(request)
