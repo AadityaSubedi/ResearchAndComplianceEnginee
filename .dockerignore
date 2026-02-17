@@ -1,0 +1,46 @@
+# Byte-compiled / cache / temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.tmp
+*.log
+
+# Environment files
+.*env
+.*env.local
+.*env.*.local
+
+# Node modules
+node_modules/
+
+# Git files
+.git
+.gitignore
+
+# Dockerfile and docker-compose override (optional)
+docker-compose.override.yml
+
+# Build / distribution folders
+dist/
+build/
+*.egg-info/
+*.egg
+
+# IDE / editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage / test reports
+coverage/
+*.cover
+*.lcov
+.nyc_output/
