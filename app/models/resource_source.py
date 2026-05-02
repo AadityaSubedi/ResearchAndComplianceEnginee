@@ -1,4 +1,5 @@
 import datetime
+from enum import unique
 from pydantic import Field, BaseModel
 from pymongo import IndexModel, ASCENDING
 from app.models.base import BaseDocument
@@ -14,6 +15,7 @@ class Provenance(BaseModel):
 
 class ResearchSource(BaseDocument):
     """Resource Source"""
+    
     content: str
     metadata: Provenance
     trust_level: int = Field(default=3, ge=1, le=5)  # 1=low, 5=high
@@ -30,6 +32,6 @@ class ResearchSource(BaseDocument):
             ),
             # Provenance index for grounding lookups
             IndexModel(
-                [("tenant_id", ASCENDING), ("metadata.file_hash", ASCENDING)]
+                [("tenant_id", ASCENDING), ("metadata.file_hash", ASCENDING)], unique=True
             ),
         ]
