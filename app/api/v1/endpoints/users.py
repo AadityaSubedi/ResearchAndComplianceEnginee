@@ -1,18 +1,25 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException
 from app.models.user import User
+from pymongo.errors import DuplicateKeyError
 
-router = APIRouter()
+router = APIRouter(dependencies=[])
 
 
 @router.post("")
 async def create_user(user: User):
     """Create a single User"""
-    await user.insert()
+    try:
+        await user.insert()
+    except DuplicateKeyError as exc:
+        raise HTTPException(
+            status_code=400, detail="User with this email already exists."
+        ) from exc
+
     return user
 
 
 @router.get("")
-async def get_users(request: Request):
+async def get_users():
     """Get all users"""
-    tenant_id = request.state.tenant_id
-    return await User.find(User.tenant_id == tenant_id).to_list()
+    
+    return await User.find().to_list()

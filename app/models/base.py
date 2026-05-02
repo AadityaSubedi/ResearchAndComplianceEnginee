@@ -10,7 +10,7 @@ from app.core.context import get_context
 
 class BaseDocument(Document):  # pylint: disable=too-many-ancestors
     """Base schema"""
-    tenant_id: str = Field(default_factory=lambda: get_context("tenant_id"))
+    org_id: str = Field(default_factory=lambda: get_context("org_id"))
     created_at: datetime.datetime = Field(default_factory=lambda: datetime.datetime.now(datetime.UTC))
 
     class Settings:
@@ -20,7 +20,7 @@ class BaseDocument(Document):  # pylint: disable=too-many-ancestors
             # Compound index for multi-tenant isolation
             IndexModel(
                 [
-                    ("tenant_id", ASCENDING), ("_id", ASCENDING)
+                    ("org_id", ASCENDING), ("_id", ASCENDING)
                 ]
             ),
         ]
@@ -30,15 +30,15 @@ class BaseDocument(Document):  # pylint: disable=too-many-ancestors
     # -----------------------------
     @classmethod
     def find(cls, *args: Any, **kwargs: Any):
-        tenant_id = get_context("tenant_id")
+        org_id = get_context("org_id")
 
         # Always enforce tenant filter
         if args:
             # Merge existing filter with tenant filter
-            combined_filter = And(cls.tenant_id == tenant_id, *args)
+            combined_filter = And(cls.org_id == org_id, *args)
             return super().find(combined_filter, **kwargs)
 
-        return super().find(cls.tenant_id == tenant_id, **kwargs)
+        return super().find(cls.org_id == org_id, **kwargs)
 
     # Disable find_all completely
     @classmethod
