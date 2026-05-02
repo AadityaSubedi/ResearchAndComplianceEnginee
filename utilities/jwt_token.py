@@ -1,5 +1,6 @@
 from fastapi import Request, HTTPException
 import jwt  # PyJWT
+from jwt import PyJWTError
 from app.core.config import settings
 from typing import Optional
 
@@ -57,14 +58,25 @@ class JWTManager:
                 jwt=encoded_token,
                 key=settings.SECRET_KEY,
                 algorithms=settings.ALGORITHM,
+                # TODO: Use the issuer validation once the auth service is ready and the tokens are issued with the correct issuer.
+                # issuer=settings.TOKEN_ISSUER,
             )
         except jwt.ExpiredSignatureError as exc:
             raise HTTPException(
                 status_code=401, detail="Token expired"
             ) from exc
+        except jwt.InvalidIssuerError as exc:
+            raise HTTPException(
+                status_code=401, detail="Invalid token issuer"
+            ) from exc
+            
         except jwt.InvalidTokenError as exc:
             raise HTTPException(
                 status_code=401, detail="Invalid token"
+            ) from exc
+        except PyJWTError as exc:
+            raise HTTPException(
+                status_code=401, detail="Token decode error"
             ) from exc
 
         return claims
