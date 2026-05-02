@@ -1,19 +1,18 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Request
 from app.core.context import set_context
+import uuid
 
 
-class TenantMiddleware(BaseHTTPMiddleware):
+class RequestContextMiddleware(BaseHTTPMiddleware):
     """Tenant Middleware"""
 
     async def dispatch(self, request: Request, call_next):
         
-        # TODO: Get the tenant id from the token.
-        tenant_id = request.headers.get("X-Tenant-ID", "")
+        request_id = request.headers.get("X-Request-ID") or uuid.uuid4().hex
         
         # Set the tenant context
-        set_context("tenant_id", tenant_id)
+        set_context(request_id=request_id)
 
-        request.state.tenant_id = tenant_id
         response = await call_next(request)
         return response
