@@ -1,9 +1,20 @@
-from fastapi import APIRouter
-from app.api.v1.endpoints import users
+from fastapi import APIRouter, Depends
 
-api_router = APIRouter()
+from app.api.v1.endpoints import health, users
+from app.middleware.jwt_middleware import require_jwt
 
-api_router.include_router(
+protected_api_router = APIRouter(dependencies=[Depends(require_jwt)])
+
+public_api_router = APIRouter()
+
+
+public_api_router.include_router(
+    health.router,
+    prefix="/health",
+    tags=["Health"],
+)
+
+protected_api_router.include_router(
     users.router,
     prefix="/users",
     tags=["Users"],
